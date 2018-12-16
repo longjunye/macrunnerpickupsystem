@@ -1,0 +1,141 @@
+package com.fairymo.macrunnerpickupsystem.views;
+
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
+
+public abstract class EndlessRecyclerViewScrollListener extends RecyclerView.OnScrollListener {
+	private int visibleThreshold = 5;
+	private int currentPage = 0;
+	private int previousTotalItemCount = 0;
+	private boolean loading = true;
+	private int startingPageIndex = 0;
+	private int defaultNoFooterViewType = -1;
+	private int footerViewType = -1;
+
+	private RecyclerView.LayoutManager mLayoutManager;
+
+	protected EndlessRecyclerViewScrollListener(LinearLayoutManager layoutManager) {
+		init();
+		this.mLayoutManager = layoutManager;
+	}
+
+	public EndlessRecyclerViewScrollListener(GridLayoutManager layoutManager) {
+		init();
+		this.mLayoutManager = layoutManager;
+		visibleThreshold = visibleThreshold * layoutManager.getSpanCount();
+	}
+
+	public EndlessRecyclerViewScrollListener(StaggeredGridLayoutManager layoutManager) {
+		init();
+		this.mLayoutManager = layoutManager;
+		visibleThreshold = visibleThreshold * layoutManager.getSpanCount();
+	}
+
+	private void init() {
+		footerViewType = getFooterViewType(defaultNoFooterViewType);
+		startingPageIndex = getStartingPageIndex();
+
+		int threshold = getVisibleThreshold();
+		if (threshold > visibleThreshold) {
+			visibleThreshold = threshold;
+		}
+	}
+
+	// This happens many times a second during a scroll, so be wary of the code you place here.
+	// We are given a few useful parameters to help us work out if we need to load some more data,
+	// but first we check if we are waiting for the previous load to finish.
+	@Override
+	public void onScrolled(final RecyclerView view, int dx, int dy) {
+		////when dy=0---->list is clear totalItemCount == 0 or init load  previousTotalItemCount=0
+		if (dy <= 0) {
+			return;
+		}
+		RecyclerView.Adapter adapter = view.getAdapter();
+		int totalItemCount = adapter.getItemCount();
+		int lastVisibleItemPosition = getLastVisibleItemPosition();
+		boolean isAllowLoadMore = (lastVisibleItemPosition + visibleThreshold) > totalItemCount;
+		if (isAllowLoadMore) {
+			if (isUseFooterView()) {
+				if (!isFooterView(adapter)) {
+					if (totalItemCount < previousTotalItemCount) {//swipeRefresh reload result to change list size ,reset pageIndex
+						this.currentPage = this.startingPageIndex;
+					} else if (totalItemCount == previousTotalItemCount) {//if load failure or load empty data , we rollback  pageindex
+						currentPage = currentPage == startingPageIndex ? startingPageIndex : --currentPage;
+					}
+					loading = false;
+				}
+			} else {
+				if (totalItemCount > previousTotalItemCount)
+					loading = false;
+			}
+			if (!loading) {
+				previousTotalItemCount = totalItemCount;
+				currentPage++;
+				onLoadMore(currentPage, totalItemCount);
+				loading = true;
+			}
+		}
+	}
+
+	@Override
+	public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+		super.onScrollStateChanged(recyclerView, newState);
+
+	}
+
+	private boolean isUseFooterView() {
+		return footerViewType != defaultNoFooterViewType;
+	}
+
+	private boolean isFooterView(RecyclerView.Adapter padapter) {
+		boolean isFooterView = false;
+		int itemCount = padapter.getItemCount();
+		if (itemCount > 0) {
+			int lastPosition = itemCount - 1;
+			int lastViewType = padapter.getItemViewType(lastPosition);
+			isFooterView = lastViewType == footerViewType;
+		}
+		return isFooterView;
+	}
+
+	private int getLastVisibleItemPosition() {
+		int lastVisibleItemPosition = 0;
+		if (mLayoutManager instanceof StaggeredGridLayoutManager) {
+			int[] lastVisibleItemPositions = ((StaggeredGridLayoutManager) mLayoutManager).findLastVisibleItemPositions(null);
+			// get maximum element within the list
+			lastVisibleItemPosition = getLastVisibleItem(lastVisibleItemPositions);
+		} else if (mLayoutManager instanceof LinearLayoutManager) {
+			lastVisibleItemPosition = ((LinearLayoutManager) mLayoutManager).findLastVisibleItemPosition();
+		} else if (mLayoutManager instanceof GridLayoutManager) {
+			lastVisibleItemPosition = ((GridLayoutManager) mLayoutManager).findLastVisibleItemPosition();
+		}
+		return lastVisibleItemPosition;
+	}
+
+	private int getLastVisibleItem(int[] lastVisibleItemPositions) {
+		int maxSize = 0;
+		for (int i = 0; i < lastVisibleItemPositions.length; i++) {
+			if (i == 0) {
+				maxSize = lastVisibleItemPositions[i];
+			} else if (lastVisibleItemPositions[i] > maxSize) {
+				maxSize = lastVisibleItemPositions[i];
+			}
+		}
+		return maxSize;
+	}
+
+	public abstract int getFooterViewType(int defaultNoFooterViewType);
+
+	public abstract void onLoadMore(int page, int totalItemsCount);
+
+	private int getVisibleThreshold() {
+		return visibleThreshold;
+	}
+
+	private int getStartingPageIndex() {
+		return startingPageIndex;
+	}
+
+}
