@@ -2,6 +2,7 @@ package com.fairymo.macrunnerpickupsystem;
 
 import android.app.Application;
 import android.support.annotation.NonNull;
+import android.support.multidex.MultiDexApplication;
 import android.webkit.WebView;
 import cn.jpush.android.api.JPushInterface;
 import com.fairymo.macrunnerpickupsystem.constants.Constant;
@@ -12,7 +13,7 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 import com.nostra13.universalimageloader.core.decode.BaseImageDecoder;
 
-public class CallingApplication extends Application {
+public class CallingApplication extends MultiDexApplication {
 	@NonNull
 	private final String TAG = getClass().getSimpleName();
 	private static Application app;
@@ -30,16 +31,11 @@ public class CallingApplication extends Application {
 	public void onCreate() {
 		super.onCreate();
 		setApp(this);
-		initBugly();
 		initJpush();
 		initImageLoader();
 		if (BuildConfig.DEBUG) {
 			WebView.setWebContentsDebuggingEnabled(true);
 		}
-	}
-
-	private void initBugly() {
-		//		CrashReport.initCrashReport(this, "a443145473", BuildConfig.DEBUG);
 	}
 
 	private void initImageLoader() {
@@ -62,6 +58,6 @@ public class CallingApplication extends Application {
 		String alias = SharedPreferencesUtil.getString(CallingApplication.getApp(),
 			Constant.BRAND_NO, Constant.DEFAULT_BRAND_NO) + SharedPreferencesUtil.getString(CallingApplication.getApp(),
 			Constant.SHOPPING_NO, Constant.DEFAULT_SHOPPING_NO) + "PickupSystem";
-		JPushInterface.setAlias(getApplicationContext(), 10086, alias);
+		JPushInterface.setAlias(getApplicationContext(), 1008612, alias);
 	}
 }

@@ -9,12 +9,13 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
 public class OptionStatusConstants {
 	@Retention(SOURCE)
 	@StringDef({
-		PREPARING, PREPARED, OTHERS
+		PREPARING, PREPARED, DONE, OTHERS
 	})
 	public @interface SourceType {
 	}
 
 	public static final String PREPARING = "PREPARING";
 	public static final String PREPARED = "PREPARED";
+	public static final String DONE = "DONE";
 	public static final String OTHERS = "OTHERS";
 }

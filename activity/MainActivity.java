@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -13,16 +14,26 @@ import android.widget.LinearLayout;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import cn.jpush.android.api.JPushInterface;
+import com.fairymo.macrunnerpickupsystem.CallingApplication;
 import com.fairymo.macrunnerpickupsystem.R;
+import com.fairymo.macrunnerpickupsystem.constants.Constant;
+import com.fairymo.macrunnerpickupsystem.entity.BaseEntity;
 import com.fairymo.macrunnerpickupsystem.entity.JpushMessage;
+import com.fairymo.macrunnerpickupsystem.entity.OptionStatus;
+import com.fairymo.macrunnerpickupsystem.network.CallingRequestFactory;
+import com.fairymo.macrunnerpickupsystem.network.CallingRxScheduler;
 import com.fairymo.macrunnerpickupsystem.option.OptionListView;
 import com.fairymo.macrunnerpickupsystem.option.OptionStatusConstants;
 import com.fairymo.macrunnerpickupsystem.utils.CollectionUtil;
 import com.fairymo.macrunnerpickupsystem.utils.LocalBroadcastManager;
+import com.fairymo.macrunnerpickupsystem.utils.SharedPreferencesUtil;
 import io.reactivex.Observable;
+import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
+import retrofit2.Response;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -56,6 +67,7 @@ public class MainActivity extends BaseActivity {
 			container.addView(optionListView);
 			optionViews.put(option, optionListView);
 		}
+		requestOptions();
 		registerMessageReceiver();
 		loop();
 	}
@@ -97,7 +109,7 @@ public class MainActivity extends BaseActivity {
 						public void run() {
 							for (String status : optionViews.keySet()) {
 								OptionListView optionListView = optionViews.get(status);
-								optionListView.update(message.getRunnerState(), message.getRunnerPickupCodes());
+								optionListView.update(message.getRunnerState(), message.getRunnerPickupCodes(), false);
 							}
 						}
 					});
@@ -120,11 +132,46 @@ public class MainActivity extends BaseActivity {
 					if (CollectionUtil.isEmpty(optionViews)) {
 						return;
 					}
-					for (String status : optionViews.keySet()) {
-						OptionListView optionListView = optionViews.get(status);
-						optionListView.requestOptions();
-					}
+					requestOptions();
 				}
 			});
+	}
+
+	public void requestOptions() {
+		for (final String optionStatus : options) {
+			Observable<Response<BaseEntity<OptionStatus>>> observable = CallingRequestFactory.getInstance().getOptions(
+				SharedPreferencesUtil.getString(CallingApplication.getApp(),
+					Constant.SHOPPING_NO, Constant.DEFAULT_SHOPPING_NO), SharedPreferencesUtil.getString(CallingApplication.getApp(),
+					Constant.BRAND_NO, Constant.DEFAULT_BRAND_NO), optionStatus);
+			observable.compose(CallingRxScheduler.<Response<BaseEntity<OptionStatus>>>compose()).subscribe(
+				new Observer<Response<BaseEntity<OptionStatus>>>() {
+					@Override
+					public void onSubscribe(Disposable d) {
+					}
+
+					@Override
+					public void onNext(Response<BaseEntity<OptionStatus>> response) {
+						if (response == null || response.body() == null || response.body().getData() == null || CollectionUtil.isEmpty(
+							response.body().getData().getPickupCodes())) {
+							return;
+						}
+						for (String status : optionViews.keySet()) {
+							OptionListView optionListView = optionViews.get(status);
+							optionListView.update(optionStatus, response.body().getData().getPickupCodes(), true);
+						}
+					}
+
+					@Override
+					public void onError(Throwable e) {
+						Log.i("ylj", e.getLocalizedMessage());
+					}
+
+					@Override
+					public void onComplete() {
+						Log.i("ylj", "onComplete");
+					}
+				});
+		}
+
 	}
 }
