@@ -63,7 +63,8 @@ public class OptionListView extends LinearLayout {
 	private void setTextType() {
 		Typeface typeface = Typeface.createFromAsset(getContext().getAssets(), "fonts/Heiti-Regular.ttf");
 		title.setTypeface(typeface);
-		titleEn.setTypeface(typeface);
+		Typeface enTypeFace = Typeface.createFromAsset(getContext().getAssets(), "fonts/Helvetica.ttf");
+		titleEn.setTypeface(enTypeFace);
 	}
 
 	private void setTitles() {

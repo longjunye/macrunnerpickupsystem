@@ -19,7 +19,7 @@ public class PreparedOptionView extends AbstractOptionView<TextView> {
 	@Override
 	protected TextView createView(@NonNull Context context, @NonNull ViewGroup parent) {
 		TextView textView = (TextView) LayoutInflater.from(context).inflate(R.layout.prepared_text_option, parent, false);
-		Typeface customFont = Typeface.createFromAsset(context.getAssets(), "fonts/Heiti-Regular.ttf");
+		Typeface customFont = Typeface.createFromAsset(context.getAssets(), "fonts/Helvetica.ttf");
 		textView.setTypeface(customFont);
 		return textView;
 	}
