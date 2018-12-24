@@ -27,6 +27,7 @@ import com.fairymo.macrunnerpickupsystem.option.OptionStatusConstants;
 import com.fairymo.macrunnerpickupsystem.utils.CollectionUtil;
 import com.fairymo.macrunnerpickupsystem.utils.LocalBroadcastManager;
 import com.fairymo.macrunnerpickupsystem.utils.SharedPreferencesUtil;
+import com.fairymo.macrunnerpickupsystem.utils.Utils;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -70,6 +71,7 @@ public class MainActivity extends BaseActivity {
 		requestOptions();
 		registerMessageReceiver();
 		loop();
+		Utils.keepScreenLongLight(this);
 	}
 
 	protected void onResume() {

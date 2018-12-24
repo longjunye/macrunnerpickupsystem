@@ -1,5 +1,6 @@
 package com.fairymo.macrunnerpickupsystem.utils;
 
+import android.app.Activity;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
@@ -17,6 +18,7 @@ import android.telephony.TelephonyManager;
 import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
 import com.fairymo.macrunnerpickupsystem.CallingApplication;
@@ -340,6 +342,12 @@ public class Utils {
 			return;
 		}
 		Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+	}
+
+	public static void keepScreenLongLight(@NonNull Activity activity) {
+		Window window = activity.getWindow();
+		window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
 	}
 }
 
