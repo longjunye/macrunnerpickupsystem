@@ -82,27 +82,26 @@ public class OptionListView extends LinearLayout {
 	}
 
 	public void update(@Nullable String status, @Nullable List<String> pickUpCodes, boolean isFromServer) {
-		if (CollectionUtil.isEmpty(pickUpCodes)) {
-			return;
-		}
 		if (isFromServer) {
 			if (optionStatus.equals(status)) {
 				currentData = pickUpCodes;
 			}
 		} else {
-			for (String code : pickUpCodes) {
-				if (OptionStatusConstants.PREPARED.equals(optionStatus)) {
-					if (OptionStatusConstants.PREPARED.equals(status) && !currentData.contains(code)) {
-						currentData.add(code);
-					} else if(OptionStatusConstants.DONE.equals(status) && currentData.contains(code)) {
-						currentData.remove(code);
-					}
-				} else if (OptionStatusConstants.PREPARING.equals(optionStatus)) {
-					if (!currentData.contains(code) && OptionStatusConstants.PREPARING.equals(status)) {
-						currentData.add(code);
-					}
-					if (currentData.contains(code) && OptionStatusConstants.PREPARED.equals(status)) {
-						currentData.remove(code);
+			if (CollectionUtil.isNotEmpty(pickUpCodes)) {
+				for (String code : pickUpCodes) {
+					if (OptionStatusConstants.PREPARED.equals(optionStatus)) {
+						if (OptionStatusConstants.PREPARED.equals(status) && !currentData.contains(code)) {
+							currentData.add(code);
+						} else if(OptionStatusConstants.DONE.equals(status)) {
+							currentData.remove(code);
+						}
+					} else if (OptionStatusConstants.PREPARING.equals(optionStatus)) {
+						if (!currentData.contains(code) && OptionStatusConstants.PREPARING.equals(status)) {
+							currentData.add(code);
+						}
+						if (currentData.contains(code) && OptionStatusConstants.PREPARED.equals(status)) {
+							currentData.remove(code);
+						}
 					}
 				}
 			}

@@ -124,7 +124,7 @@ public class MainActivity extends BaseActivity {
 
 	@SuppressLint("CheckResult")
 	private void loop() {
-		Observable.timer(30000, TimeUnit.MILLISECONDS)
+		Observable.timer(10000, TimeUnit.MILLISECONDS)
 			.subscribeOn(Schedulers.io())
 			.repeat()
 			.observeOn(AndroidSchedulers.mainThread())
@@ -153,8 +153,7 @@ public class MainActivity extends BaseActivity {
 
 					@Override
 					public void onNext(Response<BaseEntity<OptionStatus>> response) {
-						if (response == null || response.body() == null || response.body().getData() == null || CollectionUtil.isEmpty(
-							response.body().getData().getPickupCodes())) {
+						if (response == null || response.body() == null || response.body().getData() == null) {
 							return;
 						}
 						for (String status : optionViews.keySet()) {
