@@ -1,5 +1,6 @@
 package com.fairymo.macrunnerpickupsystem.network;
 
+import android.annotation.SuppressLint;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import com.fairymo.macrunnerpickupsystem.BuildConfig;
@@ -20,7 +21,7 @@ import java.lang.reflect.Type;
 import java.security.cert.CertificateException;
 
 public class CallingRequestFactory {
-	private static final String BASE_URL = "https://dev.esteelauderpos.com";
+	private static final String BASE_URL = "https://www.esteelauderpos.com";
 	private static final String BASE_URL_DEBUG = "https://dev.esteelauderpos.com";
 	private static final long TIMEOUT = 30;
 
@@ -101,10 +102,12 @@ public class CallingRequestFactory {
 			// Create a trust manager that does not validate certificate chains
 			final TrustManager[] trustAllCerts = new TrustManager[]{
 				new X509TrustManager() {
+					@SuppressLint("TrustAllX509TrustManager")
 					@Override
 					public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
 					}
 
+					@SuppressLint("TrustAllX509TrustManager")
 					@Override
 					public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
 					}
@@ -132,6 +135,7 @@ public class CallingRequestFactory {
 									}
 								}).setLevel(BuildConfig.DEBUG ? HttpLoggingInterceptor.Level.BODY : HttpLoggingInterceptor.Level.NONE));
 			builder.hostnameVerifier(new HostnameVerifier() {
+				@SuppressLint("BadHostnameVerifier")
 				@Override
 				public boolean verify(String hostname, SSLSession session) {
 					return true;
