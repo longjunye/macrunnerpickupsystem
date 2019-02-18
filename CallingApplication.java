@@ -2,9 +2,9 @@ package com.fairymo.macrunnerpickupsystem;
 
 import android.app.Application;
 import android.support.annotation.NonNull;
-import android.support.multidex.MultiDexApplication;
+import android.support.multidex.MultiDex;
 import android.webkit.WebView;
-import cn.jpush.android.api.JPushInterface;
+
 import com.fairymo.macrunnerpickupsystem.constants.Constant;
 import com.fairymo.macrunnerpickupsystem.utils.SharedPreferencesUtil;
 import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
@@ -12,8 +12,13 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 import com.nostra13.universalimageloader.core.decode.BaseImageDecoder;
+import com.tencent.tinker.entry.ApplicationLike;
+import com.tinkerpatch.sdk.TinkerPatch;
+import com.tinkerpatch.sdk.loader.TinkerPatchApplicationLike;
 
-public class CallingApplication extends MultiDexApplication {
+import cn.jpush.android.api.JPushInterface;
+
+public class CallingApplication extends Application {
 	@NonNull
 	private final String TAG = getClass().getSimpleName();
 	private static Application app;
@@ -30,6 +35,8 @@ public class CallingApplication extends MultiDexApplication {
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		MultiDex.install(this);
+		initTinker();
 		setApp(this);
 		initJpush();
 		initImageLoader();
@@ -58,6 +65,21 @@ public class CallingApplication extends MultiDexApplication {
 		String alias = SharedPreferencesUtil.getString(CallingApplication.getApp(),
 			Constant.BRAND_NO, Constant.DEFAULT_BRAND_NO) + SharedPreferencesUtil.getString(CallingApplication.getApp(),
 			Constant.SHOPPING_NO, Constant.DEFAULT_SHOPPING_NO) + "PickupSystem";
-		JPushInterface.setAlias(getApplicationContext(), 1008612, alias);
+		JPushInterface.setAlias(this, 1008612, alias);
 	}
+
+	private void initTinker() {
+		ApplicationLike tinkerApplicationLike = TinkerPatchApplicationLike.getTinkerPatchApplicationLike();
+
+		// 初始化TinkerPatch SDK, 更多配置可参照API章节中的,初始化SDK
+		TinkerPatch.init(tinkerApplicationLike)
+			.reflectPatchLibrary()
+			.setPatchRollbackOnScreenOff(true)
+			.setPatchRestartOnSrceenOff(true)
+			.setFetchPatchIntervalByHours(3);
+
+		// 每隔3个小时(通过setFetchPatchIntervalByHours设置)去访问后台时候有更新,通过handler实现轮训的效果
+		TinkerPatch.with().fetchPatchUpdateAndPollWithInterval();
+	}
+
 }

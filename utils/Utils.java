@@ -21,13 +21,13 @@ import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
+
 import com.fairymo.macrunnerpickupsystem.CallingApplication;
 import com.fairymo.macrunnerpickupsystem.constants.Constant;
+
 import okhttp3.RequestBody;
 import okio.Buffer;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
@@ -36,6 +36,9 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Random;
 import java.util.regex.Pattern;
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 
 public class Utils {
 

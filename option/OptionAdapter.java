@@ -1,6 +1,7 @@
 package com.fairymo.macrunnerpickupsystem.option;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 import com.fairymo.macrunnerpickupsystem.utils.CollectionUtil;
@@ -9,15 +10,15 @@ import java.util.List;
 
 public class OptionAdapter extends RecyclerView.Adapter<OptionAdapter.OptionViewHolder> {
 	private String optionStatus;
-	@NonNull
+	@Nullable
 	private List<String> data;
 
-	public OptionAdapter(String optionStatus, @NonNull List<String> data) {
+	public OptionAdapter(String optionStatus, @Nullable List<String> data) {
 		this.optionStatus = optionStatus;
 		this.data = data;
 	}
 
-	public void setData(@NonNull List<String> data) {
+	public void setData(@Nullable List<String> data) {
 		this.data = data;
 	}
 

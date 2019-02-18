@@ -22,11 +22,10 @@ import java.security.cert.CertificateException;
 
 public class CallingRequestFactory {
 	private static final String BASE_URL = "https://www.esteelauderpos.com";
-	private static final String BASE_URL_DEBUG = "https://dev.esteelauderpos.com";
 	private static final long TIMEOUT = 6;
 
 	private static CallingService service = new Retrofit.Builder()
-		.baseUrl(BuildConfig.DEBUG ? BASE_URL_DEBUG : BASE_URL)
+		.baseUrl(BASE_URL)
 		.addConverterFactory(
 			GsonConverterFactory.create(new GsonBuilder().setLenient().setFieldNamingPolicy(FieldNamingPolicy.IDENTITY).serializeNulls().create()))
 		.addCallAdapterFactory(RxJava2CallAdapterFactory.create())
